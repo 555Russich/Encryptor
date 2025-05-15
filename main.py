@@ -24,14 +24,16 @@ async def encrypt(message: Message):
     text = message.text.replace('/encrypt ', '')
     enc_text = []
     for s in text:
-        if s in string.ascii_lowercase:
-            i = string.ascii_lowercase.index(s)
-            char = string.ascii_lowercase[i+1]
-            enc_text.append(char)
-        elif s in string.ascii_uppercase:
-            i = string.ascii_uppercase.index(s)
-            char = string.ascii_uppercase[i+1]
-            enc_text.append(char)
+        for alphabet in (string.ascii_uppercase, string.ascii_lowercase):
+            if s in alphabet:
+                i = alphabet.index(s)
+                print(i, len(alphabet))
+                if i < len(alphabet)-1:
+                    char = alphabet[i + 1]
+                elif i == len(alphabet)-1:
+                    char = alphabet[0]
+                enc_text.append(char)
+                break
         else:
             enc_text.append(s)
 
@@ -41,24 +43,22 @@ async def encrypt(message: Message):
 
 
 @router.message(Command('decrypt'))
-async def encrypt(message: Message):
+async def decrypt(message: Message):
     text = message.text.replace('/decrypt ', '')
     dec_text = []
     for s in text:
-        if s in string.ascii_lowercase:
-            i = string.ascii_lowercase.index(s)
-            char = string.ascii_lowercase[i-1]
-            dec_text.append(char)
-        elif s in string.ascii_uppercase:
-            i = string.ascii_uppercase.index(s)
-            char = string.ascii_uppercase[i-1]
-            dec_text.append(char)
+        for alphabet in (string.ascii_uppercase, string.ascii_lowercase):
+            if s in alphabet:
+                i = alphabet.index(s)
+                char = alphabet[i-1]
+                dec_text.append(char)
+                break
         else:
             dec_text.append(s)
 
-    await message.answer(''.join(dec_text))
+    m = await message.answer(''.join(dec_text))
     await asyncio.sleep(60*60*10)
-    await message.delete()
+    await m.delete()
 
 
 async def main():
